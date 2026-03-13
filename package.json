@@ -1,0 +1,6 @@
+{
+  "name": "siggy-proxy",
+  "version": "1.0.0",
+  "description": "CORS proxy for Siggy cosmic cat bot",
+  "private": true
+}
