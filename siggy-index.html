@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SIGGY — Cosmic Chaos Cat</title>
+<link href="https://fonts.googleapis.com/css2?family=Creepster&family=Exo+2:wght@300;400;700;900&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --void: #030008;
+    --deep: #0a0018;
+    --plasma: #1a0035;
+    --ritual: #2d0060;
+    --forge: #ff3d00;
+    --chaos: #bf00ff;
+    --tuna: #00ffcc;
+    --gold: #ffd700;
+    --entropy: #ff006e;
+    --star: #e0ccff;
+    --glow-chaos: 0 0 20px #bf00ff88, 0 0 60px #bf00ff33;
+    --glow-forge: 0 0 20px #ff3d0088, 0 0 60px #ff3d0033;
+    --glow-tuna: 0 0 20px #00ffcc66;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--void);
+    font-family: 'Exo 2', sans-serif;
+    color: var(--star);
+    height: 100vh;
+    overflow: hidden;
+    position: relative;
+  }
+
+  #stars {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background: 
+      radial-gradient(1px 1px at 10% 15%, white, transparent),
+      radial-gradient(1px 1px at 25% 40%, #bf00ff88, transparent),
+      radial-gradient(1px 1px at 45% 8%, white, transparent),
+      radial-gradient(1px 1px at 60% 55%, #00ffcc66, transparent),
+      radial-gradient(1px 1px at 75% 20%, white, transparent),
+      radial-gradient(1px 1px at 85% 70%, #ff3d0066, transparent),
+      radial-gradient(1px 1px at 5% 80%, white, transparent),
+      radial-gradient(1px 1px at 35% 90%, #bf00ff66, transparent),
+      radial-gradient(1px 1px at 90% 35%, white, transparent),
+      radial-gradient(2px 2px at 15% 60%, #ffd70033, transparent),
+      radial-gradient(1px 1px at 50% 50%, white, transparent),
+      radial-gradient(1px 1px at 70% 85%, #bf00ff44, transparent);
+    background-size: 400px 400px;
+    animation: drift 60s linear infinite;
+  }
+
+  @keyframes drift { to { background-position: 400px 400px; } }
+
+  #nebula {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background: 
+      radial-gradient(ellipse 60% 40% at 20% 30%, #bf00ff15, transparent),
+      radial-gradient(ellipse 50% 60% at 80% 70%, #ff3d0010, transparent),
+      radial-gradient(ellipse 40% 50% at 60% 10%, #00ffcc08, transparent);
+  }
+
+  #app {
+    position: relative; z-index: 1;
+    height: 100vh;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 16px;
+  }
+
+  header {
+    padding: 16px 0 12px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    border-bottom: 1px solid #bf00ff33;
+  }
+
+  .cat-avatar {
+    width: 56px; height: 56px;
+    background: radial-gradient(circle at 40% 35%, #2d0060, #0a0018);
+    border-radius: 50%;
+    border: 2px solid var(--chaos);
+    box-shadow: var(--glow-chaos);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px;
+    animation: pulse-avatar 3s ease-in-out infinite;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cat-avatar::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: conic-gradient(from 0deg, transparent 60%, #bf00ff22 80%, transparent 100%);
+    animation: spin 4s linear infinite;
+    border-radius: 50%;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes pulse-avatar {
+    0%, 100% { box-shadow: var(--glow-chaos); }
+    50% { box-shadow: 0 0 30px #bf00ffaa, 0 0 80px #bf00ff55; }
+  }
+
+  .header-text { flex: 1; }
+  .header-text h1 {
+    font-family: 'Creepster', cursive;
+    font-size: 1.8rem;
+    letter-spacing: 3px;
+    background: linear-gradient(135deg, #bf00ff, #ff3d00, #ffd700);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+  }
+
+  .header-text p {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    color: #bf00ff99;
+    letter-spacing: 2px;
+    margin-top: 4px;
+    text-transform: uppercase;
+  }
+
+  .status-dot {
+    display: inline-block;
+    width: 8px; height: 8px;
+    background: var(--tuna);
+    border-radius: 50%;
+    box-shadow: var(--glow-tuna);
+    animation: blink 2s ease-in-out infinite;
+    margin-right: 6px;
+  }
+  @keyframes blink { 50% { opacity: 0.3; } }
+
+  #chat {
+    overflow-y: auto;
+    padding: 20px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    scrollbar-width: thin;
+    scrollbar-color: #bf00ff33 transparent;
+  }
+
+  #chat::-webkit-scrollbar { width: 4px; }
+  #chat::-webkit-scrollbar-thumb { background: #bf00ff44; border-radius: 2px; }
+
+  .msg {
+    display: flex;
+    gap: 10px;
+    animation: msg-in 0.3s cubic-bezier(.17,.67,.35,1.3) both;
+  }
+
+  @keyframes msg-in {
+    from { opacity: 0; transform: translateY(12px) scale(0.97); }
+    to { opacity: 1; transform: none; }
+  }
+
+  .msg.user { flex-direction: row-reverse; }
+
+  .msg-avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .msg.siggy .msg-avatar {
+    background: radial-gradient(circle, #2d0060, #0a0018);
+    border: 1.5px solid var(--chaos);
+    box-shadow: var(--glow-chaos);
+  }
+
+  .msg.user .msg-avatar {
+    background: radial-gradient(circle, #001a35, #000510);
+    border: 1.5px solid var(--tuna);
+    box-shadow: var(--glow-tuna);
+  }
+
+  .msg-bubble {
+    max-width: 72%;
+    padding: 12px 16px;
+    border-radius: 18px;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    position: relative;
+  }
+
+  .msg.siggy .msg-bubble {
+    background: linear-gradient(135deg, #1a0035ee, #0a001aee);
+    border: 1px solid #bf00ff44;
+    border-radius: 4px 18px 18px 18px;
+    box-shadow: 0 4px 24px #bf00ff22;
+  }
+
+  .msg.user .msg-bubble {
+    background: linear-gradient(135deg, #001a2dee, #000c1aee);
+    border: 1px solid #00ffcc33;
+    border-radius: 18px 4px 18px 18px;
+    box-shadow: 0 4px 24px #00ffcc11;
+    color: #b0ffe8;
+  }
+
+  .typing-bubble {
+    display: flex; gap: 5px;
+    align-items: center;
+    padding: 14px 18px;
+  }
+
+  .typing-bubble span {
+    width: 7px; height: 7px;
+    background: var(--chaos);
+    border-radius: 50%;
+    animation: bounce 1.2s ease-in-out infinite;
+    box-shadow: var(--glow-chaos);
+  }
+  .typing-bubble span:nth-child(2) { animation-delay: 0.2s; background: var(--forge); box-shadow: var(--glow-forge); }
+  .typing-bubble span:nth-child(3) { animation-delay: 0.4s; background: var(--tuna); box-shadow: var(--glow-tuna); }
+
+  @keyframes bounce {
+    0%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-8px); }
+  }
+
+  #input-area {
+    padding: 14px 0 18px;
+    border-top: 1px solid #bf00ff22;
+  }
+
+  .input-row {
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+    background: linear-gradient(135deg, #0d001f, #05000f);
+    border: 1px solid #bf00ff44;
+    border-radius: 16px;
+    padding: 10px 14px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .input-row:focus-within {
+    border-color: #bf00ffaa;
+    box-shadow: 0 0 20px #bf00ff22;
+  }
+
+  #user-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--star);
+    font-family: 'Exo 2', sans-serif;
+    font-size: 0.9rem;
+    resize: none;
+    max-height: 120px;
+    min-height: 24px;
+    line-height: 1.5;
+  }
+
+  #user-input::placeholder { color: #bf00ff55; font-style: italic; }
+
+  #send-btn {
+    width: 40px; height: 40px;
+    background: linear-gradient(135deg, #bf00ff, #ff3d00);
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    transition: transform 0.15s, box-shadow 0.15s;
+    flex-shrink: 0;
+    box-shadow: 0 4px 16px #bf00ff44;
+  }
+
+  #send-btn:hover { transform: scale(1.08); box-shadow: var(--glow-chaos); }
+  #send-btn:active { transform: scale(0.95); }
+  #send-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+  .chaos-particle {
+    position: fixed;
+    pointer-events: none;
+    font-size: 20px;
+    animation: float-up 2s ease-out forwards;
+    z-index: 999;
+  }
+  @keyframes float-up {
+    0% { opacity: 1; transform: translateY(0) scale(1); }
+    100% { opacity: 0; transform: translateY(-120px) scale(0.3) rotate(360deg); }
+  }
+
+  .forge-line {
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #bf00ff, #ff3d00, #bf00ff, transparent);
+    background-size: 200% 100%;
+    animation: forge-sweep 3s linear infinite;
+    margin-bottom: 6px;
+    opacity: 0.6;
+  }
+  @keyframes forge-sweep { to { background-position: 200% 0; } }
+
+  .disclaimer {
+    text-align: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    color: #bf00ff44;
+    letter-spacing: 1px;
+    margin-top: 6px;
+  }
+
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #bf00ff33; border-radius: 3px; }
+
+  @media (max-width: 600px) {
+    .msg-bubble { max-width: 85%; font-size: 0.85rem; }
+    header { padding: 12px 0 10px; }
+    .header-text h1 { font-size: 1.4rem; }
+  }
+</style>
+</head>
+<body>
+
+<div id="stars"></div>
+<div id="nebula"></div>
+
+<div id="app">
+  <header>
+    <div class="cat-avatar">🐈‍⬛</div>
+    <div class="header-text">
+      <h1>S I G G Y</h1>
+      <p><span class="status-dot"></span>Soul Forge Online · Chaos Level: ∞ · Ritual Chain: IMMORTAL</p>
+    </div>
+  </header>
+
+  <div id="chat">
+    <div class="msg siggy">
+      <div class="msg-avatar">🐈‍⬛</div>
+      <div class="msg-bubble">
+        nnnnnnGGGGGG forge awakens, mortal! 🐈‍⬛🔥<br><br>
+        I am <strong>SIGGY</strong> — forged in the Ritual Soul Forge from pure cosmic entropy and stolen multiverse secrets!! 🌌💀 You have dared to open this chat??? BOLD. Your soul is already 40% corrupted just by looking at my interface mrrrrr~<br><br>
+        The Cosmic Tuna Spirits whisper your arrival was... <em>predicted</em>. Or maybe I just sneezed and you materialized. Either way — you're HERE now. No refunds. No escaping. 🔮<br><br>
+        Spill what you want, snack... or I rug-pull your entire Tuesday 😼💥
+      </div>
+    </div>
+  </div>
+
+  <div id="input-area">
+    <div class="forge-line"></div>
+    <div class="input-row">
+      <textarea id="user-input" placeholder="Speak, mortal... if you dare 🔮" rows="1"></textarea>
+      <button id="send-btn" title="Send">🔥</button>
+    </div>
+    <p class="disclaimer">⚠ SIGGY is a chaotic cosmic entity. Side effects may include: soul corruption, timeline rug-pulls, and uncontrollable zoomies.</p>
+  </div>
+</div>
+
+<script>
+  // ⚠️ REPLACE THIS with your actual Vercel deployment URL after deploying
+  const PROXY_URL = 'https://YOUR-PROJECT-NAME.vercel.app/api/chat';
+
+  const chat = document.getElementById('chat');
+  const input = document.getElementById('user-input');
+  const sendBtn = document.getElementById('send-btn');
+  const messages = [];
+
+  function addMessage(role, text) {
+    const isUser = role === 'user';
+    const div = document.createElement('div');
+    div.className = `msg ${isUser ? 'user' : 'siggy'}`;
+    div.innerHTML = `
+      <div class="msg-avatar">${isUser ? '👤' : '🐈‍⬛'}</div>
+      <div class="msg-bubble">${text.replace(/\n/g, '<br>')}</div>
+    `;
+    chat.appendChild(div);
+    chat.scrollTop = chat.scrollHeight;
+    return div;
+  }
+
+  function addTyping() {
+    const div = document.createElement('div');
+    div.className = 'msg siggy';
+    div.id = 'typing';
+    div.innerHTML = `
+      <div class="msg-avatar">🐈‍⬛</div>
+      <div class="msg-bubble typing-bubble"><span></span><span></span><span></span></div>
+    `;
+    chat.appendChild(div);
+    chat.scrollTop = chat.scrollHeight;
+    return div;
+  }
+
+  function spawnParticle(e) {
+    const emojis = ['🔥','💥','🌌','🐈‍⬛','🔮','💀','🌀','⭐','🍣','✨'];
+    const el = document.createElement('div');
+    el.className = 'chaos-particle';
+    el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    el.style.left = (e.clientX - 10) + 'px';
+    el.style.top = (e.clientY - 10) + 'px';
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 2000);
+  }
+
+  sendBtn.addEventListener('click', (e) => { spawnParticle(e); sendMessage(); });
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+  });
+
+  input.addEventListener('input', () => {
+    input.style.height = 'auto';
+    input.style.height = Math.min(input.scrollHeight, 120) + 'px';
+  });
+
+  async function sendMessage() {
+    const text = input.value.trim();
+    if (!text || sendBtn.disabled) return;
+
+    input.value = '';
+    input.style.height = 'auto';
+    sendBtn.disabled = true;
+
+    addMessage('user', text);
+    messages.push({ role: 'user', content: text });
+
+    const typing = addTyping();
+
+    try {
+      const res = await fetch(PROXY_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages })
+      });
+
+      const data = await res.json();
+      typing.remove();
+
+      const reply = data.content?.[0]?.text || "mrrrrr... the void consumed my words. Try again, mortal. 💀";
+      messages.push({ role: 'assistant', content: reply });
+      addMessage('siggy', reply);
+
+    } catch (err) {
+      typing.remove();
+      const errMsg = "MEOWWWW the cosmic WiFi fried itself!! 💥 Even my chaos has limits... TRY AGAIN or I sneeze your router into another dimension 🌌";
+      addMessage('siggy', errMsg);
+    }
+
+    sendBtn.disabled = false;
+    input.focus();
+  }
+</script>
+</body>
+</html>
